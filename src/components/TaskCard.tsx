@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Trash2, Calendar } from 'lucide-react'
+import { Trash2, Calendar, Pin } from 'lucide-react'
 import { confirm } from '@tauri-apps/plugin-dialog'
 import type { Task } from '../types'
 import { PRIORITY_LABELS, STATUS_LABELS } from '../types'
@@ -16,6 +16,7 @@ const PRIORITY_BORDER: Record<string, string> = {
   high: 'border-l-red-500',
   medium: 'border-l-amber-400',
   low: 'border-l-green-500',
+  none: 'border-l-slate-700',
 }
 
 const PRIORITY_BADGE: Record<string, string> = {
@@ -45,7 +46,7 @@ export default function TaskCard({ task, showStatus = false }: Props) {
   return (
     <>
       <div
-        className={`group bg-surface-2 cursor-pointer rounded-lg border-l-[3px] p-3 transition-colors duration-150 hover:bg-[#2a2f45] ${PRIORITY_BORDER[task.priority]}`}
+        className={`group bg-surface-2 cursor-pointer rounded-lg border-l-[3px] p-3 transition-colors duration-150 hover:bg-[#2a2f45] ${PRIORITY_BORDER[task.priority ?? 'none']}`}
         onClick={() => setEditing(true)}
       >
         <div className="flex items-start justify-between gap-2">
@@ -54,13 +55,25 @@ export default function TaskCard({ task, showStatus = false }: Props) {
               {task.title}
             </span>
           </TruncatedTooltip>
-          <button
-            className="shrink-0 cursor-pointer rounded border-none bg-transparent px-1.5 py-0.5 text-slate-500 opacity-0 transition-all duration-[0.12s] group-hover:opacity-100 hover:bg-red-500/15 hover:text-red-500"
-            onClick={handleDelete}
-            title="Delete"
-          >
-            <Trash2 size={12} />
-          </button>
+          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100">
+            <button
+              className={`shrink-0 cursor-pointer rounded border-none bg-transparent px-1.5 py-0.5 transition-all duration-[0.12s] hover:bg-white/[0.07] ${task.pinned ? 'text-indigo-400' : 'text-slate-500 hover:text-slate-200'}`}
+              onClick={(e) => {
+                e.stopPropagation()
+                dispatch({ type: 'PIN_TASK', id: task.id, pinned: !task.pinned })
+              }}
+              title={task.pinned ? 'Unpin' : 'Pin to top'}
+            >
+              <Pin size={12} />
+            </button>
+            <button
+              className="shrink-0 cursor-pointer rounded border-none bg-transparent px-1.5 py-0.5 text-slate-500 transition-all duration-[0.12s] hover:bg-red-500/15 hover:text-red-500"
+              onClick={handleDelete}
+              title="Delete"
+            >
+              <Trash2 size={12} />
+            </button>
+          </div>
         </div>
         {task.description && (
           <p className="mt-1.5 line-clamp-2 text-[13px] leading-[1.4] text-slate-500 select-text">
@@ -68,11 +81,13 @@ export default function TaskCard({ task, showStatus = false }: Props) {
           </p>
         )}
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          <span
-            className={`rounded-full px-2 py-0.5 text-xs font-semibold ${PRIORITY_BADGE[task.priority]}`}
-          >
-            {PRIORITY_LABELS[task.priority]}
-          </span>
+          {task.priority && (
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-semibold ${PRIORITY_BADGE[task.priority]}`}
+            >
+              {PRIORITY_LABELS[task.priority]}
+            </span>
+          )}
           {showStatus && (
             <span className="bg-surface-2 rounded-full px-2 py-0.5 text-xs font-semibold text-slate-500">
               {STATUS_LABELS[task.status]}

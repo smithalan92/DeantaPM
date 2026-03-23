@@ -2,7 +2,7 @@ import { useActionState } from 'react'
 import { X } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import type { Task, TaskStatus, TaskPriority } from '../types'
-import { STATUS_LABELS, PRIORITY_LABELS } from '../types'
+import { STATUS_LABELS, PRIORITY_LABELS, INBOX_PROJECT_ID } from '../types'
 
 interface Props {
   task?: Task | null
@@ -18,13 +18,13 @@ export default function TaskModal({
   onClose,
 }: Props) {
   const { state, dispatch } = useApp()
-  const defaultProjectId_ = task?.projectId ?? defaultProjectId ?? state.projects[0]?.id ?? ''
+  const defaultProjectId_ = task?.projectId ?? defaultProjectId ?? INBOX_PROJECT_ID
 
   async function submitAction(_: null, formData: FormData) {
     const title = (formData.get('title') as string).trim()
     const description = (formData.get('description') as string).trim()
     const status = formData.get('status') as TaskStatus
-    const priority = formData.get('priority') as TaskPriority
+    const priority = (formData.get('priority') as string) as TaskPriority | undefined || undefined
     const dueDate = formData.get('dueDate') as string
     const projectId = formData.get('projectId') as string
     if (!title || !projectId) return null
@@ -129,9 +129,10 @@ export default function TaskModal({
                 Priority
                 <select
                   name="priority"
-                  defaultValue={task?.priority ?? 'medium'}
+                  defaultValue={task?.priority ?? ''}
                   className="form-input"
                 >
+                  <option value="">None</option>
                   {(Object.keys(PRIORITY_LABELS) as TaskPriority[]).map((p) => (
                     <option key={p} value={p}>
                       {PRIORITY_LABELS[p]}
@@ -158,7 +159,10 @@ export default function TaskModal({
                   required
                   className="form-input"
                 >
-                  {state.projects.map((p) => (
+                  {[
+                    ...state.projects.filter((p) => p.id === INBOX_PROJECT_ID),
+                    ...state.projects.filter((p) => p.id !== INBOX_PROJECT_ID),
+                  ].map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
                     </option>

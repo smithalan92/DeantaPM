@@ -1,5 +1,6 @@
 import React, { createContext, use, useReducer, useEffect, useRef } from 'react'
 import type { Project, Task } from '../types'
+import { INBOX_PROJECT, INBOX_PROJECT_ID } from '../types'
 import { loadProjects, saveProjects, loadTasks, saveTasks } from '../utils/storage'
 
 interface AppState {
@@ -18,6 +19,8 @@ type Action =
   | { type: 'UPDATE_TASK'; task: Task }
   | { type: 'DELETE_TASK'; id: string }
   | { type: 'SET_SELECTED_PROJECT'; id: string | null }
+  | { type: 'REORDER_TASKS'; orderedIds: string[] }
+  | { type: 'PIN_TASK'; id: string; pinned: boolean }
 
 function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
@@ -31,6 +34,7 @@ function reducer(state: AppState, action: Action): AppState {
         projects: state.projects.map((p) => (p.id === action.project.id ? action.project : p)),
       }
     case 'DELETE_PROJECT':
+      if (action.id === INBOX_PROJECT_ID) return state
       return {
         ...state,
         projects: state.projects.filter((p) => p.id !== action.id),
@@ -48,6 +52,26 @@ function reducer(state: AppState, action: Action): AppState {
       return { ...state, tasks: state.tasks.filter((t) => t.id !== action.id) }
     case 'SET_SELECTED_PROJECT':
       return { ...state, selectedProjectId: action.id }
+    case 'REORDER_TASKS': {
+      const orderMap = new Map(action.orderedIds.map((id, i) => [id, i * 1000]))
+      return {
+        ...state,
+        tasks: state.tasks.map((t) =>
+          orderMap.has(t.id)
+            ? { ...t, order: orderMap.get(t.id)!, updatedAt: new Date().toISOString() }
+            : t,
+        ),
+      }
+    }
+    case 'PIN_TASK':
+      return {
+        ...state,
+        tasks: state.tasks.map((t) =>
+          t.id === action.id
+            ? { ...t, pinned: action.pinned, updatedAt: new Date().toISOString() }
+            : t,
+        ),
+      }
     default:
       return state
   }
@@ -73,7 +97,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     Promise.all([loadProjects(), loadTasks()]).then(([projects, tasks]) => {
-      dispatch({ type: 'INIT', projects, tasks })
+      const hasInbox = projects.some((p) => p.id === INBOX_PROJECT_ID)
+      const seededProjects = hasInbox ? projects : [INBOX_PROJECT, ...projects]
+      dispatch({ type: 'INIT', projects: seededProjects, tasks })
     })
   }, [])
 

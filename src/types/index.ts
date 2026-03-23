@@ -16,14 +16,27 @@ export interface Task {
   title: string
   description?: string
   status: 'todo' | 'in-progress' | 'done'
-  priority: 'low' | 'medium' | 'high'
+  priority?: 'low' | 'medium' | 'high'
   dueDate?: string
+  pinned?: boolean
+  order?: number
   createdAt: string
   updatedAt: string
 }
 
+export const INBOX_PROJECT_ID = 'inbox'
+
+export const INBOX_PROJECT: Project = {
+  id: INBOX_PROJECT_ID,
+  name: 'Inbox',
+  color: '#64748b',
+  view: 'list',
+  createdAt: '2000-01-01T00:00:00.000Z',
+  updatedAt: '2000-01-01T00:00:00.000Z',
+}
+
 export type TaskStatus = Task['status']
-export type TaskPriority = Task['priority']
+export type TaskPriority = 'low' | 'medium' | 'high'
 
 export const STATUS_LABELS: Record<TaskStatus, string> = {
   todo: 'To Do',

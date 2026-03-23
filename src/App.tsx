@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { LayoutDashboard, List } from 'lucide-react'
 import { AppProvider, useApp } from './context/AppContext'
+import { INBOX_PROJECT_ID } from './types'
 import Sidebar from './components/Sidebar'
 import KanbanBoard from './components/KanbanBoard'
 import ListView from './components/ListView'
@@ -33,30 +34,32 @@ function MainArea() {
             <span className="text-sm text-slate-500 select-text">{project.description}</span>
           )}
         </div>
-        <div className="bg-surface-2 flex gap-0.5 rounded-lg p-0.5">
-          <button
-            className={`flex cursor-pointer items-center gap-1.5 rounded-md border-none px-3 py-[5px] text-sm transition-all duration-150 ${(project.view ?? 'list') === 'kanban' ? 'bg-indigo-500 text-white' : 'bg-transparent text-slate-500'}`}
-            onClick={() =>
-              dispatch({
-                type: 'UPDATE_PROJECT',
-                project: { ...project, view: 'kanban', updatedAt: new Date().toISOString() },
-              })
-            }
-          >
-            <LayoutDashboard size={14} /> Kanban
-          </button>
-          <button
-            className={`flex cursor-pointer items-center gap-1.5 rounded-md border-none px-3 py-[5px] text-sm transition-all duration-150 ${(project.view ?? 'list') === 'list' ? 'bg-indigo-500 text-white' : 'bg-transparent text-slate-500'}`}
-            onClick={() =>
-              dispatch({
-                type: 'UPDATE_PROJECT',
-                project: { ...project, view: 'list', updatedAt: new Date().toISOString() },
-              })
-            }
-          >
-            <List size={14} /> List
-          </button>
-        </div>
+        {project.id !== INBOX_PROJECT_ID && (
+          <div className="bg-surface-2 flex gap-0.5 rounded-lg p-0.5">
+            <button
+              className={`flex cursor-pointer items-center gap-1.5 rounded-md border-none px-3 py-[5px] text-sm transition-all duration-150 ${(project.view ?? 'list') === 'kanban' ? 'bg-indigo-500 text-white' : 'bg-transparent text-slate-500'}`}
+              onClick={() =>
+                dispatch({
+                  type: 'UPDATE_PROJECT',
+                  project: { ...project, view: 'kanban', updatedAt: new Date().toISOString() },
+                })
+              }
+            >
+              <LayoutDashboard size={14} /> Kanban
+            </button>
+            <button
+              className={`flex cursor-pointer items-center gap-1.5 rounded-md border-none px-3 py-[5px] text-sm transition-all duration-150 ${(project.view ?? 'list') === 'list' ? 'bg-indigo-500 text-white' : 'bg-transparent text-slate-500'}`}
+              onClick={() =>
+                dispatch({
+                  type: 'UPDATE_PROJECT',
+                  project: { ...project, view: 'list', updatedAt: new Date().toISOString() },
+                })
+              }
+            >
+              <List size={14} /> List
+            </button>
+          </div>
+        )}
       </div>
       {(project.view ?? 'list') === 'kanban' ? (
         <KanbanBoard projectId={project.id} />
