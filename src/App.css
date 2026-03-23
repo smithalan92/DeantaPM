@@ -1,0 +1,117 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-bg: #0f1117;
+  --color-surface: #1a1d27;
+  --color-surface-2: #22263a;
+  --color-edge: #2d3148;
+
+  --animate-sheet-drop: sheet-drop 0.2s cubic-bezier(0.34, 1.15, 0.64, 1);
+  --animate-tooltip-in: tooltip-in 0.1s ease-out;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  input,
+  textarea {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    color: #e2e8f0;
+    background: #0f1117;
+  }
+}
+
+@keyframes sheet-drop {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes tooltip-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom scrollbar — ::-webkit-scrollbar not expressible in Tailwind */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2d3148;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/*
+  Overdue date input — ::-webkit-datetime-edit-* pseudo-elements cannot be
+  targeted with Tailwind utilities. The .date-overdue class is applied
+  conditionally in ListView when a task is past its due date.
+*/
+.date-overdue::-webkit-datetime-edit-text {
+  color: #64748b;
+}
+.date-overdue::-webkit-datetime-edit-month-field,
+.date-overdue::-webkit-datetime-edit-day-field,
+.date-overdue::-webkit-datetime-edit-year-field {
+  color: #ef4444;
+}
+
+/* <option> element backgrounds — not styleable with Tailwind utilities */
+select option {
+  background: #2a2a2e;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@layer components {
+  /* Shared table cell styles in ListView */
+  .table-th {
+    @apply border-edge border-b px-3 py-2 text-left text-[13px] font-semibold tracking-[0.05em] text-slate-500 uppercase;
+  }
+
+  .table-td {
+    @apply border-edge group-hover:bg-surface border-b px-3 py-2.5 align-middle;
+  }
+
+  /* Shared form field styles in modals */
+  .form-input {
+    @apply h-8 rounded-md border border-white/10 bg-white/5 px-2.5 font-[inherit] text-sm text-white/90 transition-[border-color,box-shadow] duration-150 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30;
+  }
+
+  .form-label {
+    @apply flex flex-col gap-[5px] text-xs font-medium tracking-[0.06em] text-white/40 uppercase;
+  }
+}
