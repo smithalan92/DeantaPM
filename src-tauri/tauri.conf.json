@@ -16,7 +16,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": "dmg",
+    "targets": ["dmg", "app"],
     "macOS": {
       "bundleName": "Déanta"
     },
