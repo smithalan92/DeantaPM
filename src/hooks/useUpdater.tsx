@@ -3,6 +3,8 @@ import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
 import { useEffect } from 'react'
 
+const CHECK_INTERVAL = 1000 * 60 * 60 // 1 hour
+
 export default function useUpdater() {
   useEffect(() => {
     let interval: number
@@ -24,7 +26,7 @@ export default function useUpdater() {
           await relaunch()
         }
       }
-    })
+    }, CHECK_INTERVAL)
 
     return () => clearInterval(interval)
   }, [])
