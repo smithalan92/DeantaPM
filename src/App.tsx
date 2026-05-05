@@ -1,15 +1,18 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { LayoutDashboard, List } from 'lucide-react'
-import { AppProvider, useApp } from './context/AppContext'
-import { INBOX_PROJECT_ID } from './types'
-import Sidebar from './components/Sidebar'
+import './App.css'
+import Dashboard from './components/Dashboard'
 import KanbanBoard from './components/KanbanBoard'
 import ListView from './components/ListView'
-import Dashboard from './components/Dashboard'
-import './App.css'
+import Sidebar from './components/Sidebar'
+import { AppProvider, useApp } from './context/AppContext'
+import useUpdater from './hooks/useUpdater'
+import { INBOX_PROJECT_ID } from './types'
 
 function MainArea() {
   const { state, dispatch } = useApp()
+
+  useUpdater()
 
   const project = state.projects.find((p) => p.id === state.selectedProjectId)
 
