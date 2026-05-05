@@ -9,7 +9,7 @@ export default function useUpdater() {
   useEffect(() => {
     let interval: number
 
-    interval = setInterval(async () => {
+    const checkUpdates = async () => {
       const update = await check()
 
       if (update) {
@@ -26,7 +26,13 @@ export default function useUpdater() {
           await relaunch()
         }
       }
+    }
+
+    interval = setInterval(async () => {
+      checkUpdates()
     }, CHECK_INTERVAL)
+
+    checkUpdates()
 
     return () => clearInterval(interval)
   }, [])
