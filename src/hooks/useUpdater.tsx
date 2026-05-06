@@ -1,5 +1,5 @@
 import { ask } from '@tauri-apps/plugin-dialog'
-import { relaunch } from '@tauri-apps/plugin-process'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { check } from '@tauri-apps/plugin-updater'
 import { useEffect } from 'react'
 
@@ -14,16 +14,14 @@ export default function useUpdater() {
 
       if (update) {
         clearInterval(interval)
-        await update.download()
 
-        const install = await ask(
-          `Version ${update.version} has been downloaded. Restart now to apply the update?`,
-          { title: 'Update Ready', kind: 'info', okLabel: 'Restart', cancelLabel: 'Later' },
+        const openRelease = await ask(
+          `Version ${update.version} is available. Open the releases page to download it?`,
+          { title: 'Update Available', kind: 'info', okLabel: 'Download', cancelLabel: 'Later' },
         )
 
-        if (install) {
-          await update.install()
-          await relaunch()
+        if (openRelease) {
+          await openUrl('https://github.com/smithalan92/DeantaPM/releases/latest')
         }
       }
     }

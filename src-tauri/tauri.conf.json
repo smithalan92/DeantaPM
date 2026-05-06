@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Déanta",
+  "productName": "Deanta",
   "version": "0.1.2",
   "identifier": "com.deanta",
   "build": {
@@ -28,7 +28,7 @@
     "active": true,
     "targets": ["dmg", "app"],
     "macOS": {
-      "bundleName": "Déanta"
+      "bundleName": "Deanta"
     },
     "icon": [
       "icons/32x32.png",

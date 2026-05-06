@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "start": "npm run tauri dev",
     "preview": "vite preview",
     "tauri": "tauri",
     "format": "prettier --write src/",
